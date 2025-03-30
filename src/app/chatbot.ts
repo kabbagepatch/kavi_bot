@@ -68,117 +68,94 @@ export class TwitchChatBot {
 
   private setupBotBehavior() {
     this.twitchClient.on('message', (channel, tags, message, self) => {
-      let testCommand = "!test"
-      let welcomeCommand = "!welcome"
-      let helloCommand = "!hello"
-      let fruityCommand = "!frooty"
-      let oreCommand = "!ore"
-      let slayCommand = "!slay"
-      let randomsoCommand = "!randomso"
-      let agentCommand = "!agent"
-      
-      const isMod = tags.mod || tags.badges?.broadcaster;
-
       if (self) return;
 
+      const isMod = tags.mod || tags.badges?.broadcaster;
       if (message.startsWith('!')) {
-        if (message === testCommand) {
-          this.twitchClient.say(channel, `bumble194Omg heyyyy`);
-        }
+        switch (message) {
+          case '!test': this.twitchClient.say(channel, `bumble194Omg heyyyy`); break;
 
-        if (message === welcomeCommand) {
-          this.twitchClient.say(channel, `bumble194Omg so many cuties in chat. welcome to bwi stream`);
-        }
+          case '!welcome': this.twitchClient.say(channel, `bumble194Omg so many cuties in chat. welcome to bwi stream`); break;
 
-        if (message === helloCommand) {
-          this.twitchClient.say(channel, `Hello, @${tags.username}! Welcome to the channel.`);
-        }
+          case '!hello': this.twitchClient.say(channel, `Hello, @${tags.username}! Welcome to the channel.`); break;
 
-        if (message === fruityCommand) {
-          this.twitchClient.say(channel, `Things are a bit fruity around here 🌈 bumble194Uwu`);
-        }
+          case '!frooty': this.twitchClient.say(channel, `Things are a bit fruity around here 🌈 bumble194Uwu`); break;
 
-        if (message === oreCommand) {
-          this.twitchClient.say(channel, `Ore what?`);
-        }
+          case '!ore': this.twitchClient.say(channel, `Ore what?`); break;
 
-        if (message === slayCommand) {
-          this.twitchClient.say(channel, `slay`);
-        }
+          case '!slay': this.twitchClient.say(channel, `slay`); break;
 
-        if (message === agentCommand) {
-          this.twitchClient.say(channel, `Let's find ouy which valorant agent you are, @${tags.username}`);
-          const agents = {
-            'Brimstone': 'Trying to stim beacon to an early retirement. Boomer 👴',
-            'Phoenix': 'Enemies flashed 1. Allies flashed 4. Suuuper high level tactics 🔥',
-            'Sage': 'Please heal us Mommy Sage 🤰',
-            'Sova': 'Idk, go research your lineups, nerd 🏹',
-            'Viper': 'Come 😏',
-            'Cypher': 'Hidden in a minivan, eyes on everyone, looking for a corpse. Kinda creepy ngl 📹',
-            'Reyna': 'Except you\'re not. Only Bwi is Queen Reyna 👑',
-            'Killjoy': 'Ultra nerd. Give us your lunch money 🤓',
-            'Breach': 'Is there an enemy around that corner? Quick, throw all your util! 💥',
-            'Omen': 'Clear your throat please 👻',
-            'Jett': 'Super sweaty, mega toxic, instalock, never entry, cringe, unbased 💨',
-            'Raze': 'It\'s lit 🪩🎧',
-            'Skye': 'Can I workout with you? 🏋️‍♀️',
-            'Yoru': 'Or are you the clone. Would you even know? 👯‍♂️',
-            'Astra': 'More like Asssstra 🍑',
-            'Kay/o': 'Toaster! I\'m a better bot anyway 🤖',
-            'Chamber': 'Ew 💩',
-            'Neon': 'Run. Slide. Get nerfed 🏃‍♀️',
-            'Fade': 'Your life is cats, coffees and nightmares 🐈‍⬛☕',
-            'Harbor': 'It\'s Harbin\' time. Everyone is about to get soaked 🌊',
-            'Gekko': 'Pokemon trainer 🐁🐟🐦',
-            'Deadlock': 'Be friends with Wingman already. He just wants to help',
-            'Iso': 'Big man in a suit of armour. Take that off, what are you? 🛡️',
-            'Clove': 'Just here to vibe 🦋🎶',
-            'Vyse': 'Where do you get your nails done? Slay 💅',
-            'Tejo': 'Pedro Pascal coded 🧔',
-            'Waylay': 'The new gal in town 💕',
-          }
-          const agentNames = Object.keys(agents);
-          const random = Math.floor(Math.random() * agentNames.length);
-          const randomAgent = agentNames[random];
-          setTimeout(() => {
-            this.twitchClient.say(channel, `/me thinking`);
-          }, 3000);
-          setTimeout(() => {
-            this.twitchClient.say(channel, `@${tags.username} You are ${randomAgent}. ${agents[randomAgent]}`);
-          }, 6000);
-        }
+          case '!agent':
+            this.twitchClient.say(channel, `Let's find out which valorant agent you are, @${tags.username}`);
+            const agents = {
+              'Brimstone': 'Trying to stim beacon to an early retirement. Boomer 👴',
+              'Phoenix': 'Enemies flashed 1. Allies flashed 4. Suuuper high level tactics 🔥',
+              'Sage': 'Please heal us Mommy Sage 🤰',
+              'Sova': 'Idk, go research your lineups, nerd 🏹',
+              'Viper': 'Come 😏',
+              'Cypher': 'Hidden in a minivan, eyes on everyone, looking for a corpse. Kinda creepy ngl 📹',
+              'Reyna': 'Except you\'re not. Only Bwi is Queen Reyna 👑',
+              'Killjoy': 'Ultra nerd. Give us your lunch money 🤓',
+              'Breach': 'Is there an enemy around that corner? Quick, throw all your util! 💥',
+              'Omen': 'Clear your throat please 👻',
+              'Jett': 'Super sweaty, mega toxic, instalock, never entry, cringe, unbased 💨',
+              'Raze': 'It\'s lit 🪩🎧',
+              'Skye': 'Can I workout with you? 🏋️‍♀️',
+              'Yoru': 'Or are you the clone. Would you even know? 👯‍♂️',
+              'Astra': 'More like Asssstra 🍑',
+              'Kay/o': 'Toaster! I\'m a better bot anyway 🤖',
+              'Chamber': 'Ew 💩',
+              'Neon': 'Run. Slide. Get nerfed 🏃‍♀️',
+              'Fade': 'Your life is cats, coffees and nightmares 🐈‍⬛☕',
+              'Harbor': 'It\'s Harbin\' time. Everyone is about to get soaked 🌊',
+              'Gekko': 'Pokemon trainer 🐁🐟🐦',
+              'Deadlock': 'Be friends with Wingman already. He just wants to help',
+              'Iso': 'Big man in a suit of armour. Take that off, what are you? 🛡️',
+              'Clove': 'Just here to vibe 🦋🎶',
+              'Vyse': 'Where do you get your nails done? Slay 💅',
+              'Tejo': 'Pedro Pascal coded 🧔',
+              'Waylay': 'The new gal in town 💕',
+            }
+            const agentNames = Object.keys(agents);
+            const randomAgent = agentNames[Math.floor(Math.random() * agentNames.length)];
+            setTimeout(() => {
+              this.twitchClient.say(channel, `/me thinking`);
+            }, 3000);
+            setTimeout(() => {
+              this.twitchClient.say(channel, `@${tags.username} You are ${randomAgent}. ${agents[randomAgent]}`);
+            }, 6000);
+            break;
 
-        if (message === randomsoCommand) {
-          if (!isMod) {
-            if (tags['display-name'] === 'AlwaysKorean') this.twitchClient.say(channel, `Nice try Roan :]`);
-            return;
-          }
-          const peeps = [
-            'PositiveNoodles',
-            'merudesu',
-            'hollu_uwu',
-            'eggrollls',
-            'julesvernnn',
-            'joylliibee',
-            'cheebiez',
-            'bundledbri',
-            'katkashiii',
-            'guffball',
-            'crymsonfire',
-            'AlwaysKorean',
-            'Naynay_rivers',
-            'TeekayVT',
-            'KiharaAmber',
-            'Candyfirr',
-          ]
-          const random = Math.floor(Math.random() * peeps.length);
-          this.twitchClient.say(channel, `So many lovely peeps, who do we shoutout...`);
-          setTimeout(() => {
-            this.twitchClient.say(channel, `/me thinking`);
-          }, 3000);
-          setTimeout(() => {
-            this.twitchClient.say(channel, `!so ${peeps[random]}`);
-          }, 6000);
+          case '!randomso':
+            if (!isMod) {
+              if (tags['display-name'] === 'AlwaysKorean') this.twitchClient.say(channel, `Nice try Roan :]`);
+              return;
+            }
+            const peeps = [
+              'PositiveNoodles',
+              'merudesu',
+              'hollu_uwu',
+              'eggrollls',
+              'julesvernnn',
+              'joylliibee',
+              'cheebiez',
+              'bundledbri',
+              'katkashiii',
+              'guffball',
+              'crymsonfire',
+              'AlwaysKorean',
+              'Naynay_rivers',
+              'TeekayVT',
+              'KiharaAmber',
+              'Candyfirr',
+            ];
+            this.twitchClient.say(channel, `So many lovely peeps, who do we shoutout...`);
+            setTimeout(() => {
+              this.twitchClient.say(channel, `/me thinking`);
+            }, 3000);
+            setTimeout(() => {
+              this.twitchClient.say(channel, `!so ${peeps[Math.floor(Math.random() * peeps.length)]}`);
+            }, 6000);
         }
       }
     });
