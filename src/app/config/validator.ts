@@ -11,6 +11,7 @@ export class ConfigValidator {
       console.info('Validating Config...')
       let completeConfig = new ChatBotConfig(
         configJson.twitch.token_endpoint,
+        configJson.twitch.token,
         configJson.twitch.username,
         configJson.twitch.client_id,
         configJson.twitch.client_secret,

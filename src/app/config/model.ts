@@ -6,6 +6,8 @@ export class ChatBotConfig {
   @IsString()
   public tokenEndpoint: string;
 
+  public token: string;
+
   @IsNotEmpty()
   @IsString()
   public username: string;
@@ -28,6 +30,7 @@ export class ChatBotConfig {
 
   constructor(
     tokenEndpoint: string,
+    token: string,
     username: string,
     clientId: string,
     clientSecret: string,
@@ -35,6 +38,7 @@ export class ChatBotConfig {
     channel: string
   ) {
     this.tokenEndpoint = tokenEndpoint;
+    this.token = token;
     this.username = username;
     this.clientSecret = clientSecret;
     this.channel = channel;
