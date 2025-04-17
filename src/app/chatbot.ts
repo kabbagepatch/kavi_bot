@@ -5,6 +5,10 @@ import { TwitchTokenDetails } from './models/twitchTokenDetails.models';
 import { ChatBotConfig } from './config/model';
 import { TwitchTokenResponseValidator } from './utils/TwitchTokenResponseValidator';
 
+import agents from './agents.json';
+
+const agentsDone = {};
+
 export class TwitchChatBot {
   public twitchClient!: Client;
   private tokenDetails!: TwitchTokenDetails | { 'access_token': string };
@@ -62,13 +66,15 @@ export class TwitchChatBot {
         username: `${username}`,
         password: `oauth:${accessToken}`
       },
-      channels: [channel],
+      channels: ['kavisherlock', channel],
     };
   }
 
   private setupBotBehavior() {
     this.twitchClient.on('message', (channel, tags, message, self) => {
       if (self) return;
+
+      const username = tags.username ?? 'blank';
 
       const isMod = tags.mod || tags.badges?.broadcaster;
       if (message.startsWith('!')) {
@@ -77,58 +83,46 @@ export class TwitchChatBot {
 
           case '!welcome': this.twitchClient.say(channel, `bumble194Omg so many cuties in chat. welcome to bwi stream`); break;
 
-          case '!hello': this.twitchClient.say(channel, `Hello, @${tags.username}! Welcome to the channel.`); break;
+          case '!hello': this.twitchClient.say(channel, `Hello, @${username}! Welcome to the channel.`); break;
 
           case '!frooty': this.twitchClient.say(channel, `Things are a bit fruity around here 🌈 bumble194Uwu`); break;
 
           case '!ore': this.twitchClient.say(channel, `Ore what?`); break;
 
-          case '!slay': this.twitchClient.say(channel, `slay`); break;
+          case '!slay': this.twitchClient.say(channel, `slay 💅`); break;
+
+          case '!tin': this.twitchClient.say(channel, `Like the metal 🎸🤘🔥`); break;
+
+          case '!reading': 
+            if (username === 'kavisherlock') {
+              this.twitchClient.say(channel, `I'm currently reading Oathbringer by Brandon Sanderson :book: and listening to The Two Towers by J. R. R. Tolkien :headphones:`)
+            }
+            break;
 
           case '!agent':
-            this.twitchClient.say(channel, `Let's find out which valorant agent you are, @${tags.username}`);
-            const agents = {
-              'Brimstone': 'Trying to stim beacon to an early retirement. Boomer 👴',
-              'Phoenix': 'Enemies flashed 1. Allies flashed 4. Suuuper high level tactics 🔥',
-              'Sage': 'Please heal us Mommy Sage 🤰',
-              'Sova': 'Idk, go research your lineups, nerd 🏹',
-              'Viper': 'Come 😏',
-              'Cypher': 'Hidden in a minivan, eyes on everyone, looking for a corpse. Kinda creepy ngl 📹',
-              'Reyna': 'Except you\'re not. Only Bwi is Queen Reyna 👑',
-              'Killjoy': 'Ultra nerd. Give us your lunch money 🤓',
-              'Breach': 'Is there an enemy around that corner? Quick, throw all your util! 💥',
-              'Omen': 'Clear your throat please 👻',
-              'Jett': 'Super sweaty, mega toxic, instalock, never entry, cringe, unbased 💨',
-              'Raze': 'It\'s lit 🪩🎧',
-              'Skye': 'Can I workout with you? 🏋️‍♀️',
-              'Yoru': 'Or are you the clone. Would you even know? 👯‍♂️',
-              'Astra': 'More like Asssstra 🍑',
-              'Kay/o': 'Toaster! I\'m a better bot anyway 🤖',
-              'Chamber': 'Ew 💩',
-              'Neon': 'Run. Slide. Get nerfed 🏃‍♀️',
-              'Fade': 'Your life is cats, coffees and nightmares 🐈‍⬛☕',
-              'Harbor': 'It\'s Harbin\' time. Everyone is about to get soaked 🌊',
-              'Gekko': 'Pokemon trainer 🐁🐟🐦',
-              'Deadlock': 'Be friends with Wingman already. He just wants to help',
-              'Iso': 'Big man in a suit of armour. Take that off, what are you? 🛡️',
-              'Clove': 'Just here to vibe 🦋🎶',
-              'Vyse': 'Where do you get your nails done? Slay 💅',
-              'Tejo': 'Pedro Pascal coded 🧔',
-              'Waylay': 'The new gal in town 💕',
+            if (username in agentsDone) {
+              this.twitchClient.say(channel, `@${tags.username} You already found your agent for today, ${agentsDone[username]}`);
+              return;
             }
+
+            this.twitchClient.say(channel, `Let's find out which valorant agent you are, @${tags.username}`);
             const agentNames = Object.keys(agents);
             const randomAgent = agentNames[Math.floor(Math.random() * agentNames.length)];
+            const lines : string[] = agents[randomAgent];
+            const randomLine = lines[Math.floor(Math.random() * lines.length)];
+            agentsDone[username] = randomAgent;
             setTimeout(() => {
               this.twitchClient.say(channel, `/me thinking`);
-            }, 3000);
+            }, 2000);
             setTimeout(() => {
-              this.twitchClient.say(channel, `@${tags.username} You are ${randomAgent}. ${agents[randomAgent]}`);
+              this.twitchClient.say(channel, `@${tags.username} You are ${randomAgent}. ${randomLine}`);
             }, 6000);
             break;
 
           case '!randomso':
             if (!isMod) {
-              if (tags['display-name'] === 'AlwaysKorean') this.twitchClient.say(channel, `Nice try Roan :]`);
+              if (username === 'AlwaysKorean') this.twitchClient.say(channel, `Nice try Roan :]`);
+              else this.twitchClient.say(channel, `Only moderators can use this command :]`);
               return;
             }
             const peeps = [
@@ -139,9 +133,15 @@ export class TwitchChatBot {
               'julesvernnn',
               'joylliibee',
               'cheebiez',
+              'cheebiez',
+              'cheebiez',
+              'bundledbri',
+              'bundledbri',
               'bundledbri',
               'katkashiii',
               'guffball',
+              'crymsonfire',
+              'crymsonfire',
               'crymsonfire',
               'AlwaysKorean',
               'Naynay_rivers',
