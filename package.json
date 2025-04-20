@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build-andstart": "tsc && node ./dist/app.js",
+    "build": "tsc",
+    "build-and-start": "tsc && node ./dist/app.js",
     "start": "node ./dist/app.js"
   },
   "dependencies": {
@@ -14,6 +15,7 @@
     "tmi.js": "^1.8.5"
   },
   "devDependencies": {
+    "@flydotio/dockerfile": "^0.7.10",
     "@types/node": "^16.11.11",
     "@types/tmi.js": "^1.8.6",
     "eslint": "^8.4.0",

@@ -7,8 +7,7 @@ import { TwitchTokenResponseValidator } from './utils/TwitchTokenResponseValidat
 
 import agents from './agents.json';
 
-const agentsDone = {};
-
+const agentsDone : { [key: string] : { agent : string, time : number } } = {};
 export class TwitchChatBot {
   public twitchClient!: Client;
   private tokenDetails!: TwitchTokenDetails | { 'access_token': string };
@@ -57,7 +56,7 @@ export class TwitchChatBot {
 
   private buildConnectionConfig(channel: string, username: string, accessToken: string) {
     return {
-      options: { debug: true },
+      options: { debug: false },
       connection: {
         secure: true,
         reconnect: true
@@ -78,6 +77,7 @@ export class TwitchChatBot {
 
       const isMod = tags.mod || tags.badges?.broadcaster;
       if (message.startsWith('!')) {
+        console.info({ channel, username, message })
         switch (message) {
           case '!test': this.twitchClient.say(channel, `bumble194Omg heyyyy`); break;
 
@@ -100,8 +100,8 @@ export class TwitchChatBot {
             break;
 
           case '!agent':
-            if (username in agentsDone) {
-              this.twitchClient.say(channel, `@${tags.username} You already found your agent for today, ${agentsDone[username]}`);
+            if (username in agentsDone && isWithinLast12Hours(agentsDone[username].time)) {
+              this.twitchClient.say(channel, `@${tags.username} You already found your agent for today, ${agentsDone[username].agent}`);
               return;
             }
 
@@ -110,7 +110,7 @@ export class TwitchChatBot {
             const randomAgent = agentNames[Math.floor(Math.random() * agentNames.length)];
             const lines : string[] = agents[randomAgent];
             const randomLine = lines[Math.floor(Math.random() * lines.length)];
-            agentsDone[username] = randomAgent;
+            agentsDone[username] = { agent: randomAgent, time: Date.now() };
             setTimeout(() => {
               this.twitchClient.say(channel, `/me thinking`);
             }, 2000);
@@ -126,28 +126,35 @@ export class TwitchChatBot {
               return;
             }
             const peeps = [
+              'kavisherlock',
               'PositiveNoodles',
               'merudesu',
               'hollu_uwu',
+              'willowvvitch',
+              'guffball',
               'eggrollls',
+              'Candyfirr',
               'julesvernnn',
               'joylliibee',
-              'cheebiez',
-              'cheebiez',
-              'cheebiez',
-              'bundledbri',
-              'bundledbri',
-              'bundledbri',
               'katkashiii',
-              'guffball',
+              'GamingLeagueOfWomen',
+              'cheebiez',
+              'cheebiez',
+              'cheebiez',
+              'bundledbri',
+              'bundledbri',
+              'bundledbri',
               'crymsonfire',
               'crymsonfire',
               'crymsonfire',
-              'AlwaysKorean',
-              'Naynay_rivers',
               'TeekayVT',
+              'megghan_',
+              'AlwaysKorean',
+              'JellyNugget',
+              'Naynay_rivers',
               'KiharaAmber',
-              'Candyfirr',
+              'Woohoojin',
+              'caseoh_',
             ];
             this.twitchClient.say(channel, `So many lovely peeps, who do we shoutout...`);
             setTimeout(() => {
@@ -160,4 +167,10 @@ export class TwitchChatBot {
       }
     });
   }
+}
+
+const isWithinLast12Hours = (timestamp : number) => {
+  const now = Date.now();
+  const twelveHoursInMs = 12 * 60 * 60 * 1000;
+  return now - timestamp <= twelveHoursInMs;
 }
