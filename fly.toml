@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for twitch-green-sun-8059 on 2025-04-20T11:56:38-05:00
+# fly.toml app configuration file generated for kavibot-twitch on 2025-04-20T13:22:54-05:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'twitch-green-sun-8059'
+app = 'kavibot-twitch'
 primary_region = 'dfw'
 
 [build]
@@ -13,10 +13,10 @@ primary_region = 'dfw'
   force_https = true
   auto_stop_machines = 'stop'
   auto_start_machines = true
-  min_machines_running = 0
+  min_machines_running = 1
   processes = ['app']
 
 [[vm]]
-  memory = '1gb'
+  memory = '512mb'
   cpu_kind = 'shared'
   cpus = 1

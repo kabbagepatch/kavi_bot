@@ -6,8 +6,11 @@ import { ChatBotConfig } from './config/model';
 import { TwitchTokenResponseValidator } from './utils/TwitchTokenResponseValidator';
 
 import agents from './agents.json';
+import streamers from './streamers.json';
 
 const agentsDone : { [key: string] : { agent : string, time : number } } = {};
+const recentSOs : { [key : string] : string[] } = {};
+
 export class TwitchChatBot {
   public twitchClient!: Client;
   private tokenDetails!: TwitchTokenDetails | { 'access_token': string };
@@ -70,13 +73,23 @@ export class TwitchChatBot {
   }
 
   private setupBotBehavior() {
+    const commands = ['!test', '!welcome', '!hello', '!frooty', '!ore', '!slay', '!tin', '!reading', '!agent', '!randomso'];
+
+    this.twitchClient.on('clearchat', (channel) => {
+      const agentKeys = Object.keys(agentsDone);
+      agentKeys.forEach(key => {
+        if (key.includes(channel)) {
+          delete agentsDone[key];
+        }
+      });
+    });
+
     this.twitchClient.on('message', (channel, tags, message, self) => {
       if (self) return;
 
-      const username = tags.username ?? 'blank';
-
-      const isMod = tags.mod || tags.badges?.broadcaster;
-      if (message.startsWith('!')) {
+      if (commands.includes(message)) {
+        const username = tags.username ?? 'blank';
+        const isMod = tags.mod || tags.badges?.broadcaster;
         console.info({ channel, username, message })
         switch (message) {
           case '!test': this.twitchClient.say(channel, `bumble194Omg heyyyy`); break;
@@ -100,22 +113,23 @@ export class TwitchChatBot {
             break;
 
           case '!agent':
-            if (username in agentsDone && isWithinLast12Hours(agentsDone[username].time)) {
-              this.twitchClient.say(channel, `@${tags.username} You already found your agent for today, ${agentsDone[username].agent}`);
+            const agentKey = `${username}${channel}`
+            if (agentKey in agentsDone && isWithinLast4Hours(agentsDone[agentKey].time)) {
+              this.twitchClient.say(channel, `@${username} You already found your agent for today, ${agentsDone[agentKey].agent}`);
               return;
             }
 
-            this.twitchClient.say(channel, `Let's find out which valorant agent you are, @${tags.username}`);
+            this.twitchClient.say(channel, `Let's find out which valorant agent you are, @${username}`);
             const agentNames = Object.keys(agents);
             const randomAgent = agentNames[Math.floor(Math.random() * agentNames.length)];
             const lines : string[] = agents[randomAgent];
             const randomLine = lines[Math.floor(Math.random() * lines.length)];
-            agentsDone[username] = { agent: randomAgent, time: Date.now() };
+            agentsDone[agentKey] = { agent: randomAgent, time: Date.now() };
             setTimeout(() => {
               this.twitchClient.say(channel, `/me thinking`);
             }, 2000);
             setTimeout(() => {
-              this.twitchClient.say(channel, `@${tags.username} You are ${randomAgent}. ${randomLine}`);
+              this.twitchClient.say(channel, `@${username} You are ${randomAgent}. ${randomLine}`);
             }, 6000);
             break;
 
@@ -125,43 +139,25 @@ export class TwitchChatBot {
               else this.twitchClient.say(channel, `Only moderators can use this command :]`);
               return;
             }
-            const peeps = [
-              'kavisherlock',
-              'PositiveNoodles',
-              'merudesu',
-              'hollu_uwu',
-              'willowvvitch',
-              'guffball',
-              'eggrollls',
-              'Candyfirr',
-              'julesvernnn',
-              'joylliibee',
-              'katkashiii',
-              'GamingLeagueOfWomen',
-              'cheebiez',
-              'cheebiez',
-              'cheebiez',
-              'bundledbri',
-              'bundledbri',
-              'bundledbri',
-              'crymsonfire',
-              'crymsonfire',
-              'crymsonfire',
-              'TeekayVT',
-              'megghan_',
-              'AlwaysKorean',
-              'JellyNugget',
-              'Naynay_rivers',
-              'KiharaAmber',
-              'Woohoojin',
-              'caseoh_',
-            ];
-            this.twitchClient.say(channel, `So many lovely peeps, who do we shoutout...`);
+
+            if (!recentSOs[channel]) recentSOs[channel] = [];
+
+            let randomStreamer = streamers[Math.floor(Math.random() * streamers.length)];
+            while(recentSOs[channel].includes(randomStreamer)) {
+              randomStreamer = streamers[Math.floor(Math.random() * streamers.length)];
+            }
+
+            if (recentSOs[channel].length >= 5) {
+              recentSOs[channel].shift(); // Remove the first (oldest) element
+            }
+            recentSOs[channel].push(randomStreamer);
+
+            this.twitchClient.say(channel, `So many lovely streamers, who do we shoutout...`);
             setTimeout(() => {
               this.twitchClient.say(channel, `/me thinking`);
             }, 3000);
             setTimeout(() => {
-              this.twitchClient.say(channel, `!so ${peeps[Math.floor(Math.random() * peeps.length)]}`);
+              this.twitchClient.say(channel, `!so ${randomStreamer}`);
             }, 6000);
         }
       }
@@ -169,8 +165,8 @@ export class TwitchChatBot {
   }
 }
 
-const isWithinLast12Hours = (timestamp : number) => {
+const isWithinLast4Hours = (timestamp : number) => {
   const now = Date.now();
-  const twelveHoursInMs = 12 * 60 * 60 * 1000;
+  const twelveHoursInMs = 4 * 60 * 60 * 1000;
   return now - timestamp <= twelveHoursInMs;
 }
